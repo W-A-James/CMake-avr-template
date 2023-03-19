@@ -1,12 +1,19 @@
 cmake_minimum_required(VERSION 2.8)
 
-set(PROG_TYPE usbasp)
+set(PROG_TYPE stk500v1)
 
 
 # Variables regarding the AVR chip
-set(MCU   atmega328p)
-set(F_CPU 16000000)
-set(BAUD  9600)
+set(MCU   attiny84)
+set(F_CPU 8000000L)
+set(BAUD  19200)
+
+set(HFUSE -U hfuse:w:0xdf:m)
+set(LFUSE -U lfuse:w:0xe2:m )
+set(EFUSE -U efuse:w:0xff:m)
+
+set(SERIAL_PORT /dev/ttyACM0)
+
 add_definitions(-DF_CPU=${F_CPU})
 
 # program names
@@ -63,8 +70,8 @@ endforeach()
 
 # Compiler flags
 set(CSTANDARD "-std=gnu99")
-set(CDEBUG    "-gstabs -g -ggdb")
-set(CWARN     "-Wall -Wstrict-prototypes -Wl,--gc-sections -Wl,--relax")
+set(CDEBUG    "-g")
+set(CWARN     "-Wall -Wstrict-prototypes -Wpedantic -Werror -Wl,--gc-sections -Wl,--relax")
 set(CTUNING   "-funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums -ffunction-sections -fdata-sections")
 set(COPT      "-Os -lm -lprintf_flt")
 set(CMCU      "-mmcu=${MCU}")
@@ -76,7 +83,7 @@ set(CXXFLAGS "${CMCU} ${CDEBUG} ${CDEFS} ${COPT} ${CTUNING}")
 set(CMAKE_C_FLAGS   "${CFLAGS}")
 set(CMAKE_CXX_FLAGS "${CXXFLAGS}")
 set(CMAKE_ASM_FLAGS   "${CFLAGS}")
-
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # Project setup
 include_directories(${INC_PATH} ${LIB_INC_PATH})
 add_executable(${PROJECT_NAME} ${SRC_FILES} ${LIB_SRC_FILES})
@@ -87,7 +94,7 @@ add_custom_target(strip ALL     ${AVRSTRIP} "${PROJECT_NAME}.elf" DEPENDS ${PROJ
 add_custom_target(hex   ALL     ${OBJCOPY} -R .eeprom -O ihex "${PROJECT_NAME}.elf" "${PROJECT_NAME}.hex" DEPENDS strip)
 add_custom_target(eeprom        ${OBJCOPY} -j .eeprom --change-section-lma .eeprom=0 -O ihex "${PROJECT_NAME}.elf" "${PROJECT_NAME}.eeprom" DEPENDS strip)
 
-add_custom_target(flash ${AVRDUDE} -c ${PROG_TYPE} -p ${MCU} -U flash:w:${PROJECT_NAME}.hex DEPENDS hex)
+add_custom_target(flash ${AVRDUDE} -c ${PROG_TYPE} -p ${MCU} -b ${BAUD} -P ${SERIAL_PORT} ${LFUSE} ${HFUSE} ${EFUSE} -U flash:w:${PROJECT_NAME}.hex:i DEPENDS hex)
 
 
 set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${PROJECT_NAME}.hex;${PROJECT_NAME}.eeprom;${PROJECT_NAME}.lst")

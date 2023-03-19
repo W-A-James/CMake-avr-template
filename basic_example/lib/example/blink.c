@@ -1,5 +1,5 @@
 #include <avr/io.h>
 
-void blink() {
-	PORTB ^= (1 << PB5);
+void blink(void) {
+	PORTA ^= _BV(PA0);
 }

@@ -8,19 +8,19 @@ CMake-avr-example
 
 
 ### Getting Started
-This example uses the ATMega328p running at 16Mhz and is programmed by a USBASP. Modify the definitions in `CMakeLists.txt` as needed:
+This example uses the ATTiny84 running at 8Mhz and is programmed using an Arduino as ISP. Modify the definitions in `CMakeLists.txt` as needed:
 
-  * Microcontroller : `set(MCU   atmega328p)`
-  * Clockspeed : `set(F_CPU 16000000)`
-  * Programmer: `set(PROG_TYPE usbasp)`
+  * Microcontroller : `set(MCU   attiny84)`
+  * Clockspeed : `set(F_CPU 8000000L)`
+  * Programmer: `set(PROG_TYPE stk500v1)`
 
 
 
 ### Cloning, Compiling and flashing
 ```sh
-git clone https://github.com/patrick--/CMake-avr-example.git
-cd CMake-avr-example
-cd example_one
+git clone git@github.com:W-A-James/CMake-avr-template.git
+cd CMake-avr-template
+cd basic_example
 mkdir build
 cd build
 cmake ..
